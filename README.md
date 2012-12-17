@@ -25,9 +25,9 @@ a example would looks like:
 what have been done
 ==
 
-* process communication, following our defined protocol, done.
+* inter processes communication over socket, following our defined protocol.
 * defined and implemented various entity classes to represent our game.
-* the main logic, or control flow, for both server and client done.
+* the main logic, or control flow, for both server and client.
 
 
 todo list
