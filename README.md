@@ -8,18 +8,18 @@ build and test
 ==
 
 to build the solution, follow the following two commands
-'make server'
-'make client'
+`make server`
+`make client`
 
 to start server, follow following command:
-'./server nanomuncher_num input.txt port_no'
+`./server nanomuncher_num input.txt port_no`
 a example would looks like:
-'./server 10 input.txt 2008'
+`./server 10 input.txt 2008`
 
 to start a client, follow following command: 
-'./client team_name port_no'
+`./client team_name port_no`
 a example would looks like:
-'./client my_team_name 2008'
+`./client my_team_name 2008`
 
 
 what have been done
