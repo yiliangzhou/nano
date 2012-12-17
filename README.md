@@ -33,8 +33,7 @@ what have been done
 todo list
 ==
 
-* at server side, play all nanomunchers for one round, and construct
-  a state of the board.
+* at server side, play all nanomunchers for one round, resolve conflicts if any.
 * output a nice command line graph of the board.
 * at client side, give a random strategy.
 * may be add multithread into server side, and add time constraint. 
