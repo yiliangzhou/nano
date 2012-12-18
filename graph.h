@@ -16,7 +16,7 @@ class graph {
     graph& set_nodes (std::map<int, std::pair<int, int> > &);
     graph& set_edges (std::vector< std::pair<int, int> > &);
 
-    // Constructors
+    // Constructor and Assignment overloading
     graph (const graph & rhs);
     graph& operator=(const graph & rhs);
         
