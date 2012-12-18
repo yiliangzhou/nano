@@ -13,7 +13,9 @@
 #include "protocol.h"
 
 /**
- * referee mointers the game, dealing with two players.
+ * referee mointers the game, and provides methods to conduct
+ * a game by interacting with two players through underlying 
+ * connection package.
  */
 class referee {
   public:
@@ -47,13 +49,13 @@ class referee {
     int blue_left;
 
     // records the number of nanomunchers has been munched by 
-    // current player.
+    // each player
     int red_score;
     int blue_score;
 
-    // records alive nanomunchers at a specific round for current player
+    // records alive nanomunchers at a specific round for red player
     std::vector< muncher > red_munchers;
-    // records alive nanomunchers at a spcific for opponent 
+    // records alive nanomunchers at a spcific for blue player 
     std::vector< muncher > blue_munchers;
     // -----------------------------------------------------------------
 };
