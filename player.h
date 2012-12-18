@@ -11,7 +11,7 @@ class player {
   public:
     // constructor of a player.
     // to construct a player, you should tell what's the role of current
-    // player in the game, either -1 for blue, or 1 for red.
+    // player in the game.
     // You should also tell what the graph looks like at construction time.
     player (const std::string &,const graph &);
 
@@ -21,7 +21,7 @@ class player {
     std::vector< muncher > play (const state &);
 
   private:
-    // -1 for blue, 1 for red
+    // either RED or BLUE
     const std::string my_role;
 
     // information below will be updated each time a play get called. 
