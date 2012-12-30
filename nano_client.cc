@@ -29,7 +29,7 @@ int main (int argc, const char *args[]) {
   ptr_conn->read ( graph_msg );
   std::cout << "[Server] " << graph_msg << std::endl; 
   graph g = protocol::parse_graph (graph_msg);
-  std::cout << "[Graph] " << std::endl << g.str();
+  std::cout << "[Graph] " << std::endl << g.str() << std::endl;
   
   player p ( role, g );  
   std::string msg;

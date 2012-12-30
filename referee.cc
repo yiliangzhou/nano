@@ -14,6 +14,7 @@ referee::referee (const int nanomuncher_num, const char *input,
     red_left(nanomuncher_num), 
     blue_left(nanomuncher_num),
     graph_m_ (20,10), 
+    is_munching (false),
     prepare_done (false) { 
   // read input and generate graph
   prepare ();
@@ -114,9 +115,7 @@ void referee::game_init () {
 }
 
 void referee::game_loop () {
-  int i = 0;
   do {
-    std::cout << "[Refere] " << std::endl << graph_m_.str();
     state s (get_current_state ());
     std::string play_msg = protocol::generate_play_msg ( s );
     ptr_server->write (fd_for_red, play_msg);
@@ -140,12 +139,15 @@ void referee::game_loop () {
     ptr_server->write (fd_for_red, protocol::generate_ack_msg ("OK"));
     ptr_server->write (fd_for_blue, protocol::generate_ack_msg ("OK"));
     
+    is_munching = false; 
+   
     // Let all nanomunchers, along with new ones, to make one
     // move.
     play_one_round (new_munchers_red, new_munchers_blue);
-     
-    // TODO: add stopping criteria below 
-  } while ( i++ < 4 );
+
+    // Print out the graph state after one round. 
+    std::cout << "[Refere] " << std::endl << graph_m_.str() << std::endl;
+  } while ( is_munching );
 }
 
 // Play all nanomunchers for one round.
@@ -218,18 +220,20 @@ void referee::deploy_new_nanomunchers (std::vector<muncher> &reds,
 }
 
 void referee::run_nanomunchers () {
-  
+   
   // For each nanomuncher, munch the node at current position
   for (int i = 0; i < red_munchers.size(); i++) {
+    is_munching = true;
     red_munchers[i].munch ( graph_m_ );
     red_score++;
     // Temporarily move to next moveable node.
-    // Otherwise, remove it.
+    // If this nanomuncher can't move in any direction, remove it.
     if ( -1 == red_munchers[i].move_to_next_node ( graph_m_ ) ) 
       red_munchers.erase (red_munchers.begin() + i);
   }
   
   for (int i = 0; i < blue_munchers.size(); i++) {
+    is_munching = true;
     blue_munchers[i].munch ( graph_m_ );
     blue_score++;
     if ( -1 == blue_munchers[i].move_to_next_node ( graph_m_ ) )

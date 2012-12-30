@@ -51,6 +51,10 @@ class referee {
 
     graph graph_m_;
     std::string graph_msg;
+
+    // used as the stopping criteria 
+    bool is_munching;
+
     // records how many nanomunchers each player has left.
     int red_left;
     int blue_left;

@@ -53,6 +53,7 @@ struct node {
 
     // testing method, valid only when is_valid() return true.
     bool is_munched () { return (flags & MUNCHED) != INIT_FLAGS; }
+    int munched_by () { return player; }
     bool has_left_edge () { return (flags & HAS_LEFT_EDGE) != INIT_FLAGS; }
     bool has_right_edge () { return (flags & HAS_RIGHT_EDGE) != INIT_FLAGS; }
     bool has_up_edge () { return (flags & HAS_UP_EDGE) != INIT_FLAGS; } 

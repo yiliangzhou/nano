@@ -90,15 +90,31 @@ std::string graph::str () {
 
   std::vector< std::vector<char> > board_str ( y_size * 2, 
           std::vector<char>(x_size * 2, ' ') );
-   
+  int red_count = 0;
+  int blue_count = 0; 
   for (int y = 0; y < y_size; y++) {
     for (int x = 0; x < x_size; x++) {
-      // Output node state  
       int str_x = 2*x + 1;
       int str_y = 2*y + 1;
-      board_str[str_y][str_x] = ( board[y][x].is_valid() ? (
-              board[y][x].is_munched() ? 'X' : 'O' ) : ' ' );
-      // Output edges
+
+      // board_str[str_y][str_x] = ( board[y][x].is_valid() ? (
+      //        board[y][x].is_munched() ? 'X' : 'O' ) : ' ' );
+
+      if ( board[y][x].is_valid() ) {
+        if ( board[y][x].is_munched() && board[y][x].munched_by() == 1) {
+          board_str[ str_y ][ str_x ] = 'R'; 
+          red_count++;
+        } else if ( board[y][x].is_munched() && board[y][x].munched_by() == 2) {
+          board_str[ str_y ][ str_x ] = 'B';
+          blue_count++;
+        } else {
+          board_str[ str_y ][ str_x ] = 'O';
+        }
+      } else {
+        board_str[ str_y ][ str_x ] = ' ';
+      }    
+
+      // fill edges
       if ( board[y][x].is_valid() ) {
         if ( board[y][x].has_left_edge() ) { board_str[str_y][str_x - 1] = '-'; } 
         if ( board[y][x].has_right_edge() ) { board_str[str_y][str_x + 1] = '-'; } 
@@ -112,12 +128,17 @@ std::string graph::str () {
   std::stringstream ss (std::stringstream::in | std::stringstream::out);
   // No up edges exist for the first row of nodes, so skip the first
   // intermediate row.
+  // The same for the first coloum.
   for (int y = 1; y < y_size * 2; y++) {
-      for (int x = 0; x < x_size * 2; x++) {
+      for (int x = 1; x < x_size * 2; x++) {
           ss << board_str[y][x];
       }
       ss << std::endl;
   }
+
+  ss << "R: Node munched by red player." << std::endl; 
+  ss << "B: Node munched by blue player." << std::endl;
+  ss << "O: Unmunched node." << std::endl;
   return ss.str();
 }
 
