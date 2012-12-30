@@ -28,14 +28,13 @@ what have been done
 * inter processes communication over socket, following our defined protocol.
 * defined and implemented various entity classes to represent our game.
 * the main logic, or control flow, for both server and client.
-
+* at server side, play all nanomunchers for one round, resolve conflicts if any.
+* at client side, give a random strategy.
+* output a command line graph of the board.
 
 todo list
 ==
 
-* at server side, play all nanomunchers for one round, resolve conflicts if any.
-* output a nice command line graph of the board.
-* at client side, give a random strategy.
 * may be add multithread into server side, and add time constraint. 
 * enhance the socket package.
 

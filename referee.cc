@@ -2,6 +2,8 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <stdlib.h>
+#include <time.h>
 
 referee::referee (const int nanomuncher_num, const char *input,
   const char * port) : 
@@ -80,6 +82,8 @@ void referee::prepare () {
   fd_for_blue = ptr_server->accept_client(); 
 
   if (fd_for_red < 0 || fd_for_blue < 0) { prepare_done = false; return; } 
+ 
+  srand ( time(NULL) );
 
   prepare_done = true;
   return;
@@ -112,6 +116,7 @@ void referee::game_init () {
 void referee::game_loop () {
   int i = 0;
   do {
+    std::cout << "[Refere] " << std::endl << graph_m_.str();
     state s (get_current_state ());
     std::string play_msg = protocol::generate_play_msg ( s );
     ptr_server->write (fd_for_red, play_msg);
@@ -127,15 +132,15 @@ void referee::game_loop () {
 
     // play all nanomunchers ( old and new )
     std::vector<muncher> new_munchers_red = 
-        protocol::parse_add (msg_from_red);
+        protocol::parse_add (1, msg_from_red);
     std::vector<muncher> new_munchers_blue = 
-        protocol::parse_add (msg_from_blue);
-
-    // send ACK message to player
+        protocol::parse_add (2, msg_from_blue);
+    
+    // Send ACK message to player
     ptr_server->write (fd_for_red, protocol::generate_ack_msg ("OK"));
     ptr_server->write (fd_for_blue, protocol::generate_ack_msg ("OK"));
     
-    // TODO: let all nanomunchers, along with new ones, to make one
+    // Let all nanomunchers, along with new ones, to make one
     // move.
     play_one_round (new_munchers_red, new_munchers_blue);
      
@@ -143,10 +148,129 @@ void referee::game_loop () {
   } while ( i++ < 4 );
 }
 
-// TODO: implement below method, play all nanomunchers for one round.
-// resolve any conflict.
+// Play all nanomunchers for one round.
+// Resolve any conflict.
 void referee::play_one_round(std::vector<muncher> &reds,
         std::vector<muncher> &blues) {
+  // Update red_left and blue_left
+  int new_red_size = reds.size();
+  int new_blue_size = blues.size();
+   
+  // Truncate if give more nanomunchers allowed. 
+  if ( new_red_size > red_left ) {
+    new_red_size = red_left;  
+    reds.resize(new_red_size);
+  }
+  if ( new_blue_size > blue_left) {
+    new_blue_size = blue_left;  
+    blues.resize(new_blue_size);
+  }
+
+  red_left -= new_red_size;
+  blue_left -= new_blue_size;
+
+  // Phase one, apply new nanomunchers before move
+  deploy_new_nanomunchers (reds, blues);
+  // Phase two, run all nanomunchers. 
+  run_nanomunchers ();
+}
+
+void referee::deploy_new_nanomunchers (std::vector<muncher> &reds, 
+        std::vector<muncher> &blues) {
+  std::map<int, std::vector<muncher> > id2old_munchers;
+  std::map<int, std::vector<muncher> > id2new_munchers;  
+  
+  for (int i = 0; i < red_munchers.size(); i++) {
+    id2old_munchers[ red_munchers[i].get_nodeid() ].push_back(red_munchers[i]);
+  }
+  for (int i = 0; i < blue_munchers.size(); i++) {
+    id2old_munchers[ blue_munchers[i].get_nodeid() ].push_back(blue_munchers[i]);
+  }
+  for (int i = 0; i < reds.size(); i++) {
+    id2new_munchers[ reds[i].get_nodeid() ].push_back(reds[i]);
+  }
+  for (int i = 0; i < blues.size(); i++) {
+    id2new_munchers[ blues[i].get_nodeid() ].push_back(blues[i]);
+  }
+
+  // red_munchers.clear();
+  // blue_munchers.clear();
+
+  // Resolve conflict when adding new nanomunchers
+  std::map<int, std::vector<muncher> >::iterator it;
+  for (it = id2new_munchers.begin(); it != id2new_munchers.end(); it++) {
+    // Old nanomuncher kill new nanomunchers.
+    if (id2old_munchers.find( (*it).first ) != id2old_munchers.end()) continue;
+
+    // Randomly pick one nanomuncher.
+    int index = 0;
+    if ( (*it).second.size() > 1) {
+      index = rand () % (*it).second.size(); 
+    }
+    if ( (*it).second[index].get_player() == 1 ) {
+      // a red nanomuncher
+      red_munchers.push_back( (*it).second[index] );
+    } else {
+      // a blue nanomuncher
+      blue_munchers.push_back ( (*it).second[index] );
+    }
+  } 
+}
+
+void referee::run_nanomunchers () {
+  
+  // For each nanomuncher, munch the node at current position
+  for (int i = 0; i < red_munchers.size(); i++) {
+    red_munchers[i].munch ( graph_m_ );
+    red_score++;
+    // Temporarily move to next moveable node.
+    // Otherwise, remove it.
+    if ( -1 == red_munchers[i].move_to_next_node ( graph_m_ ) ) 
+      red_munchers.erase (red_munchers.begin() + i);
+  }
+  
+  for (int i = 0; i < blue_munchers.size(); i++) {
+    blue_munchers[i].munch ( graph_m_ );
+    blue_score++;
+    if ( -1 == blue_munchers[i].move_to_next_node ( graph_m_ ) )
+      blue_munchers.erase (blue_munchers.begin() + i);
+  }
+  
+  // Resolve conflict when more than one nanomunchers move into
+  // a single node. 
+  std::map< int, std::vector<muncher> > id2munchers;
+  for (int i = 0; i < red_munchers.size(); i++) {
+    id2munchers[ red_munchers[i].get_nodeid() ].push_back (red_munchers[i]);
+  }
+  for (int i = 0; i < blue_munchers.size(); i++) {
+    id2munchers[ blue_munchers[i].get_nodeid() ].push_back (blue_munchers[i]);
+  }
+  
+  red_munchers.clear();
+  blue_munchers.clear();
+
+  std::map<int, std::vector<muncher> >::iterator it;
+  for (it = id2munchers.begin(); it != id2munchers.end(); it++) {
+    int index = 0;
+    if ( (*it).second.size() > 1 ) {
+      int max_priority = -1;
+      // up > left > down > right
+      for (int i = 0; i < (*it).second.size(); i++) {
+        int current_priority = (*it).second[i].get_last_movement_priority ();
+        if ( current_priority > max_priority ) {
+          max_priority = current_priority;
+          index = i;
+        } 
+      } 
+    }
+    if ( (*it).second[index].get_player() == 1 ) {
+      // a red nanomuncher
+      red_munchers.push_back( (*it).second[index] );
+    } else {
+      // a blue nanomuncher
+      blue_munchers.push_back ( (*it).second[index] );
+    }
+  } 
 }
 
 std::string referee::declare_result () {
@@ -161,13 +285,9 @@ std::string referee::declare_result () {
 }
 
 state referee::get_current_state () const {
-  // TODO: constuct a state class to reflect current state
-  // Below return a sample state 
-  std::vector<muncher> ms;
-  muncher m (10, "LRDU", 1);
-  ms.push_back(m);
-  ms.push_back(m);
-  std::vector<int> en(5, 1);
-  state s (5, 4, 10, ms, 5, ms, en);
+  // constuct a state class to reflect current state
+  std::vector<int> eaten_nodes = graph_m_.get_eaten_nodes();
+  state s (red_score, blue_score, red_left, red_munchers, blue_left, blue_munchers,
+          eaten_nodes);
   return s;
 }

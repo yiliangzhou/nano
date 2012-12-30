@@ -33,7 +33,7 @@ class protocol {
     static state parse_play (const std::string &); 
     static std::string generate_play_msg (const state &);
 
-    static std::vector<muncher> parse_add (const std::string &);
+    static std::vector<muncher> parse_add (int, const std::string &);
     static std::string generate_add_msg (const std::vector<muncher> &);
 
     static std::string parse_ack (const std::string &);

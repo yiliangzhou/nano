@@ -29,7 +29,7 @@ class state {
     std::vector<muncher> get_blue_munchers () const; 
     std::vector<int> get_eaten_nodes () const;
 
-    std::string str ();    
+    std::string str () const;    
   private:    
     int red_score;
     int blue_score;

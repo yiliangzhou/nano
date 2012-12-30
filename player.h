@@ -21,6 +21,12 @@ class player {
     std::vector< muncher > play (const state &);
 
   private:
+    // update information using state parsed from PLAY message
+    void update (const state &);
+
+    // strategy for playing nanomunchers
+    std::vector< muncher > random_play ();
+
     // either RED or BLUE
     const std::string my_role;
 
@@ -30,7 +36,7 @@ class player {
     // internal representation of a graph state. 
     graph graph_m_;
 
-    // records how many nanomunchers a player has left.
+    // records how many nanomunchers a player can play.
     int my_nano_count_;
     int opponent_nano_count_; 
 

@@ -3,7 +3,7 @@
 #include <sstream>
 
 #include <boost/algorithm/string.hpp>
-        
+#include <boost/lexical_cast.hpp>        
 
 bool protocol::is_gameover_msg (const std::string &msg) {
   return msg.find ("GAMEOVER") != std::string::npos;
@@ -96,16 +96,19 @@ state protocol::parse_play (const std::string &msg) {
   boost::algorithm::trim (play_msg); 
   std::vector<std::string> strs;
   boost::split(strs, play_msg, boost::is_any_of(";"));
-  std::stringstream ss (std::stringstream::in | std::stringstream::out);
+  // std::stringstream ss (std::stringstream::in | std::stringstream::out);
   // strs[0] stores red score
-  ss << strs[0];
-  ss >> red_score;
+  red_score = boost::lexical_cast< int > (strs[0]);
   // strs[1] stores blue score
-  ss << strs[1];
-  ss >> blue_score;
+  // ss.str("");
+  // ss << strs[1];
+  // ss >> blue_score;
+  blue_score = boost::lexical_cast< int > (strs[1]);
   // strs[2] stores red left
-  ss << strs[2];
-  ss >> red_left;
+  // ss.str("");
+  // ss << strs[2];
+  // ss >> red_left;
+  red_score = boost::lexical_cast< int > (strs[2]);
   // strs[3] stores alive red nanomunchers if any
   std::vector<std::string> red_muncher_strs;
   boost::split(red_muncher_strs, strs[3], boost::is_any_of(",")); 
@@ -120,8 +123,10 @@ state protocol::parse_play (const std::string &msg) {
   }
 
   // strs[4] stores blue left
-  ss << strs[4];
-  ss >> blue_left;
+  // ss.str("");
+  // ss << strs[4];
+  // ss >> blue_left;
+  blue_left = boost::lexical_cast< int > (strs[4]);
   // strs[5] stores allive blue nanomunchers if any
   std::vector<std::string> blue_muncher_strs;
   boost::split(blue_muncher_strs, strs[5], boost::is_any_of(","));  
@@ -147,7 +152,7 @@ state protocol::parse_play (const std::string &msg) {
   } 
 
   state new_state ( red_score, blue_score, red_left, red_munchers,
-        blue_left, blue_munchers, eaten_nodes );  
+        blue_left, blue_munchers, eaten_nodes );
   return new_state;
 }
 
@@ -183,17 +188,22 @@ std::string protocol::generate_play_msg (const state & s) {
   return ss.str();
 }
 
-std::vector<muncher> protocol::parse_add (const std::string &msg) {
+std::vector<muncher> protocol::parse_add (int player , const std::string &msg) {
   std::string add_msg = msg.substr(msg.find(":") + 1);
+  
+  boost::algorithm::trim (add_msg); 
+  
   std::vector<muncher> munchers;
   std::vector<std::string> muncher_strs;
   boost::split(muncher_strs, add_msg, boost::is_any_of(",")); 
   for (int i = 0; i < muncher_strs.size(); i++) {
+    if ( muncher_strs[i].empty() ) continue;
+
     std::istringstream iss (muncher_strs[i]);
     int nodeid, count;
     std::string program;
     iss >> nodeid >> program >> count;
-    muncher alive_muncher (nodeid, program, count);
+    muncher alive_muncher (nodeid, program, count, player);
     munchers.push_back (alive_muncher);
   }  
   return munchers;

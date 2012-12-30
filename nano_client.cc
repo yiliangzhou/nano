@@ -15,7 +15,8 @@ int main (int argc, const char *args[]) {
   }
   connection *ptr_conn = new socket_client ("localhost", args[2], "\n");  
   // send team name to server
-  std::string join_msg = protocol::generate_join_msg (args[1]);
+  std::string team_name (args[1]);
+  std::string join_msg = protocol::generate_join_msg (team_name);
   ptr_conn->write (join_msg);
   // receive role from server 
   std::string role_msg;
@@ -28,16 +29,17 @@ int main (int argc, const char *args[]) {
   ptr_conn->read ( graph_msg );
   std::cout << "[Server] " << graph_msg << std::endl; 
   graph g = protocol::parse_graph (graph_msg);
-  std::cout << "[Graph] " << std::endl << g.str() << std::endl;
+  std::cout << "[Graph] " << std::endl << g.str();
   
   player p ( role, g );  
   std::string msg;
   do {
     ptr_conn->read ( msg );
     if ( protocol::is_gameover_msg( msg ) ) { break; } 
-    std::cout << "[Server] " << msg <<std::endl;
+    std::cout << "[Server] " << msg << std::endl;
     state s( protocol::parse_play( msg ) );
     msg.assign( protocol::generate_add_msg ( p.play(s) ));
+    std::cout << "[" << team_name << "] " << msg << std::endl;
     ptr_conn->write( msg );
 
     // read ACK message, here simply ignore it.

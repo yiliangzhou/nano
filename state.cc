@@ -50,7 +50,7 @@ state::state (const state &rhs) {
 }
 
 // construct a STATE message
-std::string state::str () { 
+std::string state::str () const{ 
   std::stringstream ss (std::stringstream::in | std::stringstream::out); 
   std::string delim ("; ");
   ss << "red score: " << red_score << delim;

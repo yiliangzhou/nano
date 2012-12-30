@@ -29,6 +29,13 @@ class referee {
   private:
     void prepare ();
     void play_one_round (std::vector<muncher> &, std::vector<muncher> &);
+    // Deploy new nanomunchers to current graph before each
+    // round, and resolve any conflict
+    void deploy_new_nanomunchers (std::vector<muncher> &, 
+            std::vector<muncher> &);
+    // Play all nanomunchers, and resolve conflict 
+    void run_nanomunchers ();
+
     state get_current_state () const; 
 
     bool prepare_done;
