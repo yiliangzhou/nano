@@ -9,7 +9,7 @@ client: nano_client.o protocol.o graph.o state.o muncher.o player.o socket_clien
 nano_server.o: nano_server.cc
 	g++ -c nano_server.cc
 nano_client.o: nano_client.cc
-	g++ -c nano_client.cc
+	g++ -std=c++0x -c nano_client.cc
 referee.o: referee.h protocol.h graph.h state.h muncher.h referee.cc
 	g++ -c referee.cc
 protocol.o: node.h protocol.h protocol.cc

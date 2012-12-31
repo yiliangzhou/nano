@@ -1,4 +1,6 @@
 #include <iostream>
+#include <memory>
+
 #include "protocol.h"
 #include "player.h"
 #include "graph.h"
@@ -13,7 +15,9 @@ int main (int argc, const char *args[]) {
         << " <team_name> <port>" << std::endl;
     return 0;
   }
-  connection *ptr_conn = new socket_client ("localhost", args[2], "\n");  
+  // connection *ptr_conn = new socket_client ("localhost", args[2], "\n");  
+  std::shared_ptr<connection> ptr_conn ( 
+          new socket_client ("localhost", args[2], "\n") );
   // send team name to server
   std::string team_name (args[1]);
   std::string join_msg = protocol::generate_join_msg (team_name);
@@ -50,6 +54,6 @@ int main (int argc, const char *args[]) {
   // print out result received from server
   std::cout << "[Server] " <<  msg << std::endl;
 
-  delete ptr_conn;
+  // delete ptr_conn;
   return 0;
 }
