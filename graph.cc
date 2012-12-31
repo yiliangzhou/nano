@@ -83,6 +83,7 @@ graph::~graph () {
   for (int i = 0; i < y_size; i++) {
     delete [] board[i];
   }
+  delete [] board;
 }
 
 // Construct a command line string to represent the graph

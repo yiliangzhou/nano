@@ -151,7 +151,7 @@ namespace conn {
 	    break;
 	}
 
-        delete tmp_buff;
+        delete [] tmp_buff;
 	return ret;
     }
 	

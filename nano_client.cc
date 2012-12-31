@@ -49,5 +49,7 @@ int main (int argc, const char *args[]) {
 
   // print out result received from server
   std::cout << "[Server] " <<  msg << std::endl;
+
+  delete ptr_conn;
   return 0;
 }
