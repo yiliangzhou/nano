@@ -146,7 +146,7 @@ void referee::game_loop () {
     play_one_round (new_munchers_red, new_munchers_blue);
 
     // Print out the graph state after one round. 
-    std::cout << "[Refere] " << std::endl << graph_m_.str() << std::endl;
+    std::cout << "[Referee] " << std::endl << graph_m_.str() << std::endl;
   } while ( is_munching );
 }
 

@@ -13,7 +13,7 @@
 int main (int argc, const char* argv[]) {
   if (argc < 4) {
     std::cout << "usage: " << argv[0] 
-        << " <num_of_munchers> <input_fil> <port_no>" << std::endl;
+        << " <num_of_munchers> <input_file> <port_no>" << std::endl;
     return -1;
   }
   
