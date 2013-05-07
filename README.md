@@ -36,7 +36,6 @@ todo list
 ==
 
 * simplify nano_client.cc, move logic to player class.
-* may be add multithread into server side, and add time constraint. 
 * enhance the socket package.
 
 
